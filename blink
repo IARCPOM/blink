@@ -1,0 +1,32 @@
+#!/bin/sh
+
+get_random_foreground(){
+	printf "\e[38;5;%dm" "$(($(date "+%Y%m%d%H%M%S%N" | cksum | sed "s/ .*//")%256))"
+}
+
+get_random_background(){
+	printf "\e[48;5;%dm" "$(($(date "+%Y%m%d%H%M%S%N" | cksum | sed "s/ .*//")%256))"
+}
+
+move_cursor_random_position(){
+	printf "\e[%d;%dH" "$(($(($(date "+%Y%m%d%H%M%S%N" | cksum | sed "s/ .*//")%$(tput lines)))+1))" "$(($(($(date "+%Y%m%d%H%M%S%N" | cksum | sed "s/ .*//")%$(tput cols)))+1))"
+}
+
+#INITIALIZATION
+clear
+print_time=0
+
+while true
+do
+	move_cursor_random_position
+	printf "$(get_random_background)$(get_random_foreground)\e[5m█"
+	
+	print_time=$(($print_time+1))
+	
+	if [ $print_time -ge $(($(($(tput cols)*$(tput lines)))/10)) ]
+	then
+		clear
+		print_time=0
+	fi
+	sleep 0.01
+done
